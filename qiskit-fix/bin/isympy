@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/muhammadabdullahwaqar/Desktop/Internship Work/CETQAP/VQE/qiskit-fix/bin/python" "$0" "$@"
+'''exec' "/Users/muhammadabdullahwaqar/Desktop/Internship Work/CETQAP/VQE/qiskit-fix/bin/python3.10" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

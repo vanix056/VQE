@@ -1,29 +1,32 @@
-from qiskit import Aer, execute
+from qiskit import Aer
 from qiskit.algorithms import VQE
 from qiskit.circuit.library import TwoLocal
 from qiskit.algorithms.optimizers import SLSQP
+from qiskit.opflow import PauliSumOp, PauliExpectation
+from qiskit.utils import QuantumInstance
 
-# Example: Define qubit_hamiltonians as a list of SparsePauliOp objects
-from qiskit.opflow import PauliSumOp
-from qiskit.quantum_info import SparsePauliOp
-
-# Replace this with your actual Hamiltonians
+# Convert your SparsePauliOp to PauliSumOp (opflow format)
 qubit_hamiltonians = [
-	SparsePauliOp.from_list([("I", 1.0)]),
-	SparsePauliOp.from_list([("Z", 1.0)]),
-	SparsePauliOp.from_list([("ZZ", 1.0)])  # Example for H_3
+    PauliSumOp.from_list([("I", 1.0)]),
+    PauliSumOp.from_list([("Z", 1.0)]),
+    PauliSumOp.from_list([("ZZ", 1.0)])  # Example for H_3
 ]
 
-# Suppose qubit_hamiltonians[2] is H_3 (already prepared as SparsePauliOp)
 H3 = qubit_hamiltonians[2]
 num_qubits = H3.num_qubits
 
-# Define ansatz (2 layers of 2-local entangling circuit)
+# Define ansatz
 ansatz = TwoLocal(num_qubits, ['ry', 'rz'], 'cx', reps=2, entanglement='full')
 
-# Set up VQE
-vqe = VQE(ansatz=ansatz, optimizer=SLSQP(), quantum_instance=Aer.get_backend('statevector_simulator'))
+# Set up QuantumInstance
+quantum_instance = QuantumInstance(Aer.get_backend('statevector_simulator'))
 
-# Run VQE to get minimum eigenvalue
+# Set up VQE with PauliExpectation
+vqe = VQE(ansatz=ansatz, 
+          optimizer=SLSQP(), 
+          quantum_instance=quantum_instance,
+          expectation=PauliExpectation())
+
+# Run VQE
 vqe_result = vqe.compute_minimum_eigenvalue(H3)
 print("VQE ground state energy:", vqe_result.optimal_value)
